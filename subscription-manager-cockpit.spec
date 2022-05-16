@@ -1,0 +1,78 @@
+Name: subscription-manager-cockpit
+Version: 2
+Release: 1%{?dist}
+Summary: Subscription Manager Cockpit UI
+Group: System Environment/Base
+License: LGPLv2
+URL: https://www.candlepinproject.org/
+
+Source0: %{name}-%{version}.tar.xz
+Source1: %{name}-node-%{version}.tar.xz
+BuildArch: noarch
+BuildRequires: nodejs
+BuildRequires: make
+BuildRequires: libappstream-glib
+BuildRequires: gettext
+BuildRequires: desktop-file-utils
+%if 0%{?rhel} && 0%{?rhel} <= 8
+BuildRequires: libappstream-glib-devel
+%endif
+
+Requires: subscription-manager
+Requires: cockpit-bridge
+Requires: cockpit-shell
+Requires: rhsm-icons
+# Used by desktop UI, but not necessary for web UI
+Recommends: cockpit-ws
+
+%description
+Subscription Manager Cockpit UI
+
+%package -n rhsm-icons
+Summary: Icons for Red Hat Subscription Management client tools
+
+# As these two packages previously contained the icons now contained in
+# rhsm-icons package, we need to specify the logical complement to a
+# "Requires", which is "Conflicts". With any luck the underlying
+# depsolver will cause the removal of this package if the request
+# is to downgrade either of the following to a version below these
+# requirements.
+Conflicts: rhsm-gtk < 1.26.7
+Conflicts: subscription-manager-cockpit < 1.26.7
+
+%description -n rhsm-icons
+This package contains the desktop icons for the graphical interfaces provided for management
+of Red Hat subscriptions: subscription-manager-gui, subscription-manager-cockpit-plugin.
+
+%prep
+%setup -q -n %{name}
+%setup -q -a 1 -n %{name}
+
+%build
+# ignore pre-built webpack in release tarball and rebuild it
+rm -rf dist
+ESLINT=0 NODE_ENV=production make
+
+%install
+%make_install
+appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/metainfo/*
+desktop-file-validate %{buildroot}/%{_datadir}/applications/*
+
+# drop source maps, they are large and just for debugging
+find %{buildroot}%{_datadir}/cockpit/ -name '*.map' | xargs --no-run-if-empty rm --verbose
+
+%files
+%license LICENSE
+%dir %{_datadir}/cockpit/subscription-manager
+%{_datadir}/applications/*
+%{_datadir}/cockpit/subscription-manager/*
+%{_datadir}/metainfo/*
+
+%files -n rhsm-icons
+%{_datadir}/icons/hicolor/scalable/apps/*.svg
+%{_datadir}/icons/hicolor/symbolic/apps/*.svg
+
+%changelog
+* Tue May 03 2022 Christopher Snyder <csnyder@redhat.com> 2-1
+- new package built with tito
+
