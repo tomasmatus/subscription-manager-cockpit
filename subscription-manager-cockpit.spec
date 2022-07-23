@@ -1,6 +1,6 @@
 Name: subscription-manager-cockpit
 Version: 2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Subscription Manager Cockpit UI
 Group: System Environment/Base
 License: LGPLv2
@@ -73,6 +73,9 @@ find %{buildroot}%{_datadir}/cockpit/ -name '*.map' | xargs --no-run-if-empty rm
 %{_datadir}/icons/hicolor/symbolic/apps/*.svg
 
 %changelog
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
 * Tue May 03 2022 Christopher Snyder <csnyder@redhat.com> 2-1
 - new package built with tito
 
