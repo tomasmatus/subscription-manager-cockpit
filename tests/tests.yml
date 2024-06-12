@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tags:
+  - classic
+  - atomic
+  roles:
+  - role: standard-test-basic
+    tests:
+    - smoke:
+        dir: smoke
+        run: ./smoke.sh
