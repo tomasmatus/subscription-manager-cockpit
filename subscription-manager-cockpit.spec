@@ -1,6 +1,6 @@
 Name: subscription-manager-cockpit
 Version: 6
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Subscription Manager Cockpit UI
 %if 0%{?suse_version}
 Group: System Environment/Base
@@ -83,6 +83,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/*
 %{_datadir}/icons/hicolor/symbolic/apps/*.svg
 
 %changelog
+* Tue Oct 29 2024 Troy Dawson <tdawson@redhat.com> - 6-5
+- Bump release for October 2024 mass rebuild:
+  Resolves: RHEL-64018
+
 * Mon Jun 24 2024 Troy Dawson <tdawson@redhat.com> - 6-4
 - Bump release for June 2024 mass rebuild
 
