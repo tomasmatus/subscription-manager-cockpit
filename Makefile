@@ -24,8 +24,8 @@ SMBEXT_TAR=$(CURDIR)/dist/subscription-manager-build-extra.tar.gz
 NODE_MODULES_TEST=package-lock.json
 # one example file in dist/ from webpack to check if that already ran
 WEBPACK_TEST=dist/manifest.json
-# one example file in src/lib to check if it was already checked out
-LIB_TEST=src/lib/cockpit-po-plugin.js
+# one example file in pkg/lib to check if it was already checked out
+LIB_TEST=pkg/lib/cockpit-po-plugin.js
 # common arguments for tar, mostly to make the generated tarballs reproducible
 TAR_ARGS = --sort=name --mtime "@$(shell git show --no-patch --format='%at')" --mode=go=rX,u+rw,a-s --numeric-owner --owner=0 --group=0
 
@@ -52,13 +52,13 @@ po/$(PACKAGE_NAME).js.pot:
 		--keyword=gettext:1,1t --keyword=gettext:1c,2,2t \
 		--keyword=ngettext:1,2,3t --keyword=ngettext:1c,2,3,4t \
 		--keyword=gettextCatalog.getString:1,3c --keyword=gettextCatalog.getPlural:2,3,4c \
-		--from-code=UTF-8 $$(find src/ \( -name '*.js' -o -name '*.jsx' \) \! -path 'src/lib/*')
+		--from-code=UTF-8 $$(find src/ \( -name '*.js' -o -name '*.jsx' \) \! -path 'pkg/lib/*')
 
 po/$(PACKAGE_NAME).html.pot: $(NODE_MODULES_TEST) $(LIB_TEST)
-	src/lib/html2po.js -o $@ $$(find src -name '*.html' \! -path 'src/lib/*')
+	pkg/lib/html2po.js -o $@ $$(find src -name '*.html' \! -path 'pkg/lib/*')
 
 po/$(PACKAGE_NAME).manifest.pot: $(NODE_MODULES_TEST) $(LIB_TEST)
-	src/lib/manifest2po.js src/manifest.json -o $@
+	pkg/lib/manifest2po.js src/manifest.json -o $@
 
 po/$(PACKAGE_NAME).metainfo.pot: $(APPSTREAMFILE)
 	xgettext --default-domain=$(PACKAGE_NAME) --output=$@ $<
@@ -79,8 +79,8 @@ po/LINGUAS:
 %.spec: %.spec.tmpl
 	sed -e 's/%{VERSION}/$(VERSION)/g' $< > $@
 
-$(WEBPACK_TEST): $(NODE_MODULES_TEST) $(LIB_TEST) $(shell find src/ -type f) package.json webpack.config.js
-	NODE_ENV=$(NODE_ENV) node_modules/.bin/webpack
+$(WEBPACK_TEST): $(NODE_MODULES_TEST) $(LIB_TEST) $(shell find src/ -type f) package.json build.js
+	$(MAKE) package-lock.json && NODE_ENV=$(NODE_ENV) ./build.js
 
 watch: $(NODE_MODULES_TEST) $(LIB_TEST)
 	NODE_ENV=$(NODE_ENV) node_modules/.bin/webpack --watch
@@ -133,7 +133,7 @@ $(TARFILE): $(WEBPACK_TEST) $(SPEC)
 	if type desktop-file-validate >/dev/null 2>&1; then desktop-file-validate data/*.desktop; fi
 	tar --xz $(TAR_ARGS) -cf $(TARFILE) --transform 's,^,$(RPM_NAME)/,' \
 		--exclude $(SPEC).tmpl --exclude node_modules \
-		$$(git ls-files) src/lib package-lock.json $(SPEC) dist/
+		$$(git ls-files) pkg/lib package-lock.json $(SPEC) dist/
 
 $(NODE_CACHE): $(NODE_MODULES_TEST)
 	tar --xz $(TAR_ARGS) -cf $@ node_modules
@@ -222,17 +222,16 @@ bots:
 # 327
 test/common:
 	flock Makefile sh -ec '\
-	    git fetch --depth=1 https://github.com/cockpit-project/cockpit.git bfc4a81e06a66695892e99b90661e0af7c533975; \
+	    git fetch --depth=1 https://github.com/cockpit-project/cockpit.git 336.2; \
 	    git checkout --force FETCH_HEAD -- test/common; \
 	    git reset test/common'
 
 # checkout Cockpit's PF/React/build library; again this has no API stability guarantee, so check out a stable tag
 $(LIB_TEST):
 	flock Makefile sh -ec '\
-	    git fetch --depth=1 https://github.com/cockpit-project/cockpit.git 290; \
+	    git fetch --depth=1 https://github.com/cockpit-project/cockpit.git 336.2; \
 	    git checkout --force FETCH_HEAD -- pkg/lib; \
 	    git reset -- pkg/lib'
-	mv pkg/lib src/ && rmdir -p pkg
 
 # checkout subscription-manager at the branch we want
 subscription-manager:
