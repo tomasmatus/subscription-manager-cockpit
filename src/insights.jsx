@@ -289,7 +289,7 @@ function show_connect_dialog() {
                     disabled: checking_install,
                 }
             ],
-            idle_message: progress_message && <div><Spinner isSVG className="dialog-wait-ct-spinner" size="md" /><span>{ progress_message }</span></div>,
+            idle_message: progress_message && <div><Spinner  className="dialog-wait-ct-spinner" size="md" /><span>{ progress_message }</span></div>,
             static_error: error_message,
             dialog_done: f => { if (!f && cancel) cancel(); }
         };
@@ -461,7 +461,7 @@ function show_status_dialog() {
                 {
                     cancel_caption: _("Cancel"),
                     actions: [ ],
-                    idle_message: <Spinner isSVG className="dialog-wait-ct-spinner" size="md" />,
+                    idle_message: <Spinner  className="dialog-wait-ct-spinner" size="md" />,
                 });
             unregister().then(
                 () => {

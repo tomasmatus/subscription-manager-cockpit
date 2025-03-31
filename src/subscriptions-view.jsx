@@ -26,7 +26,7 @@ import { ListingTable } from "cockpit-components-table.jsx";
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import {
     Alert, AlertGroup, AlertActionCloseButton, Button,
-    Card, CardActions, CardBody, CardHeader, CardHeaderMain, CardTitle,
+    Card, CardBody, CardHeader, CardTitle,
     DescriptionList, DescriptionListDescription, DescriptionListGroup, DescriptionListTerm,
     Gallery, Label, Page, PageSection, Split, SplitItem, Text, TextVariants,
     EmptyState, EmptyStateVariant, EmptyStateBody
@@ -292,7 +292,7 @@ class SubscriptionStatus extends React.Component {
         } else {
             syspurpose_card_body = (
                 <div>
-                    <EmptyState variant={EmptyStateVariant.small}>
+                    <EmptyState variant={EmptyStateVariant.sm}>
                         <EmptyStateBody>
                             {_("No system purpose attributes set")}
                         </EmptyStateBody>
@@ -304,9 +304,9 @@ class SubscriptionStatus extends React.Component {
         syspurpose = (
             <Card id="syspurpose" key="syspurpose" className="ct-card-info">
                 <CardHeader>
-                    <CardHeaderMain>
+                    actions={<>
                         <Text className="purpose-header" component={TextVariants.h2}>{_("System purpose")}</Text>
-                    </CardHeaderMain>
+                    </>}
                 </CardHeader>
                 <CardBody>
                     {syspurpose_card_body}
@@ -334,9 +334,8 @@ class SubscriptionStatus extends React.Component {
         return (
             <>
                 <Card id="overview" key="overview" className={ syspurpose !== null ? "ct-card-info" : "" }>
-                    <CardHeader>
+                    <CardHeader actions={{ actions: <>{action}</>, hasNoOffset: false, className: undefined}} >
                         <CardTitle><Text component={TextVariants.h2}>{_("Overview")}</Text></CardTitle>
-                        <CardActions>{action}</CardActions>
                     </CardHeader>
                     <CardBody>
                         <DescriptionList isHorizontal>

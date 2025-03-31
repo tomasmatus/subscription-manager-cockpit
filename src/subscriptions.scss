@@ -17,8 +17,8 @@
  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
  */
 
-@use'page.scss';
-@use'ct-card.scss';
+@use 'page.scss';
+@use 'ct-card.scss';
 
 #app .pf-c-card {
     @extend .ct-card;
