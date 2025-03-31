@@ -181,7 +181,7 @@ class InstalledProducts extends React.Component {
         return (
             <Card id="products" className="products" key="products">
                 <CardHeader>
-                    <CardTitle><Text component={TextVariants.h2}>{_("Installed products")}</Text></CardTitle>
+                    <CardTitle>{_("Installed products")}</CardTitle>
                     { card_actions }
                 </CardHeader>
                 <CardBody className="contains-list">
@@ -304,9 +304,9 @@ class SubscriptionStatus extends React.Component {
         syspurpose = (
             <Card id="syspurpose" key="syspurpose" className="ct-card-info">
                 <CardHeader>
-                    actions={<>
-                        <Text className="purpose-header" component={TextVariants.h2}>{_("System purpose")}</Text>
-                    </>}
+                    <CardTitle className="purpose-header">
+                        {_("System purpose")}
+                    </CardTitle>
                 </CardHeader>
                 <CardBody>
                     {syspurpose_card_body}
@@ -334,8 +334,8 @@ class SubscriptionStatus extends React.Component {
         return (
             <>
                 <Card id="overview" key="overview" className={ syspurpose !== null ? "ct-card-info" : "" }>
-                    <CardHeader actions={{ actions: <>{action}</>, hasNoOffset: false, className: undefined}} >
-                        <CardTitle><Text component={TextVariants.h2}>{_("Overview")}</Text></CardTitle>
+                    <CardHeader actions={{ actions: action }} >
+                        <CardTitle>{_("Overview")}</CardTitle>
                     </CardHeader>
                     <CardBody>
                         <DescriptionList isHorizontal>
