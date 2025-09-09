@@ -1,5 +1,5 @@
 Name: subscription-manager-cockpit
-Version: 8
+Version: 9
 Release: 1%{?dist}
 Summary: Subscription Manager Cockpit UI
 %if 0%{?suse_version}
@@ -85,6 +85,14 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/*
 %{_datadir}/icons/hicolor/symbolic/apps/*.svg
 
 %changelog
+
+* Tue Sep 09 2025 mhorky <mhorky@redhat.com> 9-1
+- remove src/po.js (tomatus777@tomatus.cz)
+- translate placeholder strings (tomatus777@tomatus.cz)
+- index.html: fix import order and make localization work again (tomatus777@tomatus.cz)
+- Fixes: RHEL-111937
+
+  (tomatus777@tomatus.cz)
 * Sat Jul 05 2025 Jiri Hnidek <jhnidek@redhat.com> 8-1
 - Translated using Weblate (Italian) (info@salvatorecocuzza.it)
 - Translated using Weblate (Chinese (Traditional) (zh_TW)) (noreply-mt-weblate-
