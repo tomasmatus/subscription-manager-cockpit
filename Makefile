@@ -25,7 +25,7 @@ NODE_MODULES_TEST=package-lock.json
 # one example file in dist/ from webpack to check if that already ran
 DIST_TEST=dist/manifest.json
 # one example file in pkg/lib to check if it was already checked out
-LIB_TEST=pkg/lib/cockpit-po-plugin.js
+COCKPIT_REPO_STAMP=pkg/lib/cockpit-po-plugin.js
 # common arguments for tar, mostly to make the generated tarballs reproducible
 TAR_ARGS = --sort=name --mtime "@$(shell git show --no-patch --format='%at')" --mode=go=rX,u+rw,a-s --numeric-owner --owner=0 --group=0
 
@@ -38,6 +38,25 @@ IMAGE_CUSTOMIZE_INSTALL = --upload $(SUBMAN_TAR):/var/tmp/ --upload $(SMBEXT_TAR
 endif
 
 all: $(DIST_TEST)
+
+# checkout common files from Cockpit repository required to build this project;
+# this has no API stability guarantee, so check out a stable tag when you start
+# a new project, use the latest release, and update it from time to time
+COCKPIT_REPO_FILES = \
+	pkg/lib \
+	test/common \
+	tools/node-modules \
+	$(NULL)
+
+COCKPIT_REPO_URL = https://github.com/cockpit-project/cockpit.git
+COCKPIT_REPO_COMMIT = 285617ec7a583bb282a15e326244a5f6346f28c4 # 343 + 16 commits
+
+$(COCKPIT_REPO_FILES): $(COCKPIT_REPO_STAMP)
+COCKPIT_REPO_TREE = '$(strip $(COCKPIT_REPO_COMMIT))^{tree}'
+$(COCKPIT_REPO_STAMP): Makefile
+	@git rev-list --quiet --objects $(COCKPIT_REPO_TREE) -- 2>/dev/null || \
+	    git fetch --no-tags --no-write-fetch-head --depth=1 $(COCKPIT_REPO_URL) $(COCKPIT_REPO_COMMIT)
+	git archive $(COCKPIT_REPO_TREE) -- $(COCKPIT_REPO_FILES) | tar x
 
 #
 # i18n
@@ -54,10 +73,10 @@ po/$(PACKAGE_NAME).js.pot:
 		--keyword=gettextCatalog.getString:1,3c --keyword=gettextCatalog.getPlural:2,3,4c \
 		--from-code=UTF-8 $$(find src/ -name '*.js' -o -name '*.jsx')
 
-po/$(PACKAGE_NAME).html.pot: $(NODE_MODULES_TEST) $(LIB_TEST)
+po/$(PACKAGE_NAME).html.pot: $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP)
 	pkg/lib/html2po -o $@ $$(find src -name '*.html')
 
-po/$(PACKAGE_NAME).manifest.pot: $(NODE_MODULES_TEST) $(LIB_TEST)
+po/$(PACKAGE_NAME).manifest.pot: $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP)
 	pkg/lib/manifest2po -o $@ src/manifest.json
 
 po/$(PACKAGE_NAME).metainfo.pot: $(APPSTREAMFILE)
@@ -79,10 +98,10 @@ po/LINGUAS:
 %.spec: %.spec.tmpl
 	sed -e 's/%{VERSION}/$(VERSION)/g' $< > $@
 
-$(DIST_TEST): $(NODE_MODULES_TEST) $(LIB_TEST) $(shell find src/ -type f) package.json build.js
+$(DIST_TEST): $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP) $(shell find src/ -type f) package.json build.js
 	NODE_ENV=$(NODE_ENV) node build.js
 
-watch: $(NODE_MODULES_TEST) $(LIB_TEST)
+watch: $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP)
 	NODE_ENV=$(NODE_ENV) node build.js --watch
 
 clean:
@@ -217,22 +236,6 @@ bots:
 	git clone --quiet --reference-if-able $${XDG_CACHE_HOME:-$$HOME/.cache}/cockpit-project/bots https://github.com/cockpit-project/bots.git
 	if [ -n "$$COCKPIT_BOTS_REF" ]; then git -C bots fetch --quiet --depth=1 origin "$$COCKPIT_BOTS_REF"; git -C bots checkout --quiet FETCH_HEAD; fi
 	@echo "checked out bots/ ref $$(git -C bots rev-parse HEAD)"
-
-# checkout Cockpit's test API; this has no API stability guarantee, so check out a stable tag
-# when you start a new project, use the latest release, and update it from time to time
-# 327
-test/common:
-	flock Makefile sh -ec '\
-	    git fetch --depth=1 https://github.com/cockpit-project/cockpit.git 3fac9ac3c253075101e3ce5d0437d643f29194ef; \
-	    git checkout --force FETCH_HEAD -- test/common; \
-	    git reset test/common'
-
-# checkout Cockpit's PF/React/build library; again this has no API stability guarantee, so check out a stable tag
-$(LIB_TEST):
-	flock Makefile sh -ec '\
-	    git fetch --depth=1 https://github.com/cockpit-project/cockpit.git 3fac9ac3c253075101e3ce5d0437d643f29194ef; \
-	    git checkout --force FETCH_HEAD -- pkg/lib; \
-	    git reset -- pkg/lib'
 
 # checkout subscription-manager at the branch we want
 subscription-manager:
