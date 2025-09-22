@@ -152,7 +152,7 @@ $(TARFILE): $(DIST_TEST) $(SPEC)
 	if type desktop-file-validate >/dev/null 2>&1; then desktop-file-validate data/*.desktop; fi
 	tar --xz $(TAR_ARGS) -cf $(TARFILE) --transform 's,^,$(RPM_NAME)/,' \
 		--exclude $(SPEC).tmpl --exclude node_modules \
-		$$(git ls-files) pkg/lib package-lock.json $(SPEC) dist/
+		$$(git ls-files) $(COCKPIT_REPO_FILES) $(NODE_MODULES_TEST) $(SPEC) dist/
 
 $(NODE_CACHE): $(NODE_MODULES_TEST)
 	tar --xz $(TAR_ARGS) -cf $@ node_modules
@@ -245,11 +245,8 @@ subscription-manager:
 	git -C subscription-manager checkout --quiet FETCH_HEAD
 	@echo "checked out subscription-manager/ ref $$(git -C subscription-manager rev-parse HEAD)"
 
-$(NODE_MODULES_TEST): package.json
-	# if it exists already, npm install won't update it; force that so that we always get up-to-date packages
-	rm -f package-lock.json
-	# unset NODE_ENV, skips devDependencies otherwise
-	env -u NODE_ENV npm install --ignore-scripts
-	env -u NODE_ENV npm prune
+FORCE:
+package-lock.json: FORCE $(COCKPIT_REPO_STAMP)
+	tools/node-modules make_package_lock_json
 
 .PHONY: all clean install devel-install devel-uninstall print-version dist node-cache rpm prepare-check check vm print-vm
