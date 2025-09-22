@@ -89,3 +89,25 @@ repository.
 Please see [Cockpit's test documentation](https://github.com/cockpit-project/cockpit/blob/main/test/README.md)
 for details how to run against existing VMs, interactive browser window,
 interacting with the test VM, and more.
+
+# Updating `node_modules`
+
+During a normal build from a git checkout, the `node_modules` will be
+automatically unpacked from a cache kept in a separate git repository.  You can
+force the unpack to occur using the `tools/node-modules checkout` command, but
+this shouldn't be necessary.  In the event that you need to modify
+`package.json` (to install a new module, for example) then you'll need to run
+`tools/node-modules install` to create a new cache from the result of running
+`npm install` on your new `package.json`.
+
+Your locally rebuilt changes to `node_modules` won't be used by others.  A new
+version will be created by a GitHub workflow when you open your pull request.
+
+The `tools/node-modules` script inspects the `GITHUB_BASE` environment variable
+to determine the correct repository to use when fetching and pushing.  It will
+strip the repository name (leaving the project- or username) and use the
+`node-cache.git` repository in that namespace.  If `GITHUB_BASE` is unset, it
+will default to `cockpit-project/node-cache.git`.
+
+A local cache is maintained in `~/.cache/cockpit-dev`.
+
