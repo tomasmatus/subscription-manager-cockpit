@@ -262,7 +262,6 @@ class SubscriptionStatus extends React.Component {
         }
 
         // Display system purpose only in the case, when it make sense
-        let syspurpose = null;
         let syspurpose_card_body;
 
         const p = this.props.syspurpose;
@@ -303,7 +302,7 @@ class SubscriptionStatus extends React.Component {
             );
         }
 
-        syspurpose = (
+        const syspurpose = (
             <Card id="syspurpose" key="syspurpose" className="ct-card-info">
                 <CardTitle>{_("System purpose")}</CardTitle>
                 <CardBody>
@@ -335,7 +334,7 @@ class SubscriptionStatus extends React.Component {
 
         return (
             <>
-                <Card id="overview" key="overview" className={ syspurpose !== null ? "ct-card-info" : "" }>
+                <Card id="overview" key="overview" className="ct-card-info">
                     <CardHeader actions={{ actions: action, hasNoOffset: false }}>
                         <CardTitle>{_("Overview")}</CardTitle>
                     </CardHeader>

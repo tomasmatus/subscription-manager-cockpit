@@ -316,7 +316,6 @@ client.registerSystem = (subscriptionDetails, update_progress) => new Promise((r
         connection_options.proxy_password = dbus_str('');
     }
 
-    console.debug('connection_options:', connection_options);
     isRegistering = true;
 
     registerServer.wait(() => {
