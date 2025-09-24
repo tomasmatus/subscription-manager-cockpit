@@ -95,11 +95,11 @@ po/LINGUAS:
 # Build/Install/dist
 #
 
-%.spec: %.spec.tmpl
+$(SPEC): $(SPEC).tmpl $(NODE_MODULES_TEST)
 	sed -e 's/%{VERSION}/$(VERSION)/g' $< > $@
 
-$(DIST_TEST): $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP) $(shell find src/ -type f) package.json build.js
-	NODE_ENV=$(NODE_ENV) node build.js
+$(DIST_TEST): $(COCKPIT_REPO_STAMP) $(shell find src/ -type f) package.json build.js
+	$(MAKE) package-lock.json && NODE_ENV=$(NODE_ENV) ./build.js
 
 watch: $(NODE_MODULES_TEST) $(COCKPIT_REPO_STAMP)
 	NODE_ENV=$(NODE_ENV) node build.js --watch
