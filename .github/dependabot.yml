@@ -43,6 +43,13 @@ updates:
       - dependency-name: "*react*"
         update-types: ["version-update:semver-major"]
 
+      # Ignore eslint >= 9
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+
+      - dependency-name: "eslint-plugin-promise"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: "github-actions"
     directory: "/"
     open-pull-requests-limit: 3
