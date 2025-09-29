@@ -19,16 +19,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get latest tag number
+        run: |
+            echo "TAG_VERSION=$(git describe --tags)" >> $GITHUB_ENV
+
       # https://github.blog/2022-04-12-git-security-vulnerability-announced/
       - name: Pacify git's permission check
         run: git config --global --add safe.directory /__w/subscription-manager-cockpit/subscription-manager-cockpit
 
       - name: Workaround for https://github.com/actions/checkout/pull/697
-        run: git fetch --force origin $(git describe --tags):refs/tags/$(git describe --tags)
+        run: git fetch --force origin ${{ env.TAG_VERSION }}:refs/tags/${{ env.TAG_VERSION }}
 
         # TODO: cockpit custom action cannot take multiple files
       - name: Build release
         run: make dist node-cache
+
+        # NOTE: see if this works on my fork when pushed to actions
+      - name: Create the release
+        run: gh release create --notes-from-tag "${{ env.TAG_VERSION }}" "subscription-manager-cockpit-${{ env.TAG_VERSION }}.tar.xz" "subscription-manager-cockpit-node-${{ env.TAG_VERSION }}.tar.xz"
 
       # TODO: look at `gh create release` and see if it can include tar files into release
       # - name: Publish GitHub release
