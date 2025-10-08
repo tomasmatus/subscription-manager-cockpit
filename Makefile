@@ -2,6 +2,10 @@
 PACKAGE_NAME := $(shell awk '/"name":/ {gsub(/[",]/, "", $$2); print $$2}' package.json)
 RPM_NAME := $(PACKAGE_NAME)-cockpit
 VERSION := $(shell T=$$(git describe 2>/dev/null | awk -f get_git_version.awk) || T=1; echo $$T)
+# awk script returns an empty string with cockpit style of tagging, get the correct version number
+ifeq ($(VERSION),)
+VERSION := $(shell T=$$(git describe 2>/dev/null) || T=1; echo $$T | tr '-' '.')
+endif
 ifeq ($(TEST_OS),)
 TEST_OS = centos-9-stream
 endif
