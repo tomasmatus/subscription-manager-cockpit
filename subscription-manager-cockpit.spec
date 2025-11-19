@@ -1,5 +1,5 @@
 Name: subscription-manager-cockpit
-Version: 9
+Version: 11.1
 Release: 1%{?dist}
 Summary: Subscription Manager Cockpit UI
 %if 0%{?suse_version}
@@ -10,14 +10,10 @@ License: LGPL-2.1-or-later
 %endif
 URL: https://www.candlepinproject.org/
 
-Source0: %{name}-%{version}.tar.xz
-Source1: %{name}-node-%{version}.tar.xz
+Source0: https://github.com/cockpit-project/subscription-manager-cockpit/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source1: https://github.com/cockpit-project/subscription-manager-cockpit/releases/download/%{version}/%{name}-node-%{version}.tar.xz
 BuildArch: noarch
 ExclusiveArch: %{nodejs_arches} noarch
-%if 0%{?fedora}
-BuildRequires: nodejs-devel
-%endif
-BuildRequires: nodejs
 BuildRequires: make
 BuildRequires: libappstream-glib
 BuildRequires: gettext
@@ -55,11 +51,9 @@ of Red Hat subscriptions: subscription-manager-gui, subscription-manager-cockpit
 
 %prep
 %autosetup -n %{name} -a 1
-# ignore pre-built webpack in release tarball and rebuild it
-rm -rf dist
 
 %build
-ESLINT=0 NODE_ENV=production make
+# Nothing to build, build is done via the Makefile
 
 %install
 %make_install PREFIX=/usr
@@ -85,12 +79,17 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/*
 %{_datadir}/icons/hicolor/symbolic/apps/*.svg
 
 %changelog
+* Thu Nov 13 2025 Packit <hello@packit.dev> - 11.1-1
+- packaging automation fixes
 
 * Tue Sep 09 2025 mhorky <mhorky@redhat.com> 9-1
 - remove src/po.js (tomatus777@tomatus.cz)
 - translate placeholder strings (tomatus777@tomatus.cz)
 - index.html: fix import order and make localization work again (tomatus777@tomatus.cz)
 - Fixes: RHEL-111937
+
+* Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
   (tomatus777@tomatus.cz)
 * Sat Jul 05 2025 Jiri Hnidek <jhnidek@redhat.com> 8-1
