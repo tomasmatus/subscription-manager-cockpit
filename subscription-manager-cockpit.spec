@@ -1,5 +1,5 @@
 Name: subscription-manager-cockpit
-Version: 11.1
+Version: 13
 Release: 1%{?dist}
 Summary: Subscription Manager Cockpit UI
 %if 0%{?suse_version}
@@ -79,6 +79,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/*
 %{_datadir}/icons/hicolor/symbolic/apps/*.svg
 
 %changelog
+* Wed Jan 28 2026 Packit <hello@packit.dev> - 13-1
+- Bug fixes and translation updates
+
 * Thu Nov 13 2025 Packit <hello@packit.dev> - 11.1-1
 - packaging automation fixes
 
